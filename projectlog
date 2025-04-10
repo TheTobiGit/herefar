@@ -8,4 +8,11 @@
 
 [X] Add Nuxt modules
     [X] Install `@vueuse/nuxt`, `nuxt-icon`, and `@nuxt/image` using `bun`.
-    [X] Add modules to `nuxt.config.ts`. 
+    [X] Add modules to `nuxt.config.ts`.
+
+[X] Define data models
+    [X] Receive usage example from user.
+    [X] Analyze example and README description.
+    [X] Propose TypeScript interfaces.
+    [X] Place interfaces in `types/` directory.
+    [X] Refine `EntityCategory` with broader categories. 
