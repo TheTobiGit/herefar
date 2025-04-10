@@ -1,0 +1,1 @@
+Herefar is a web app that connects you to the places and information you need, wherever you are. From government agencies and schools to hospitals and emergency services, Herefar delivers reliable, up-to-date details—making the far feel near.
