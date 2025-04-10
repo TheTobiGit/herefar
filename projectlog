@@ -1,0 +1,11 @@
+## Scratchpad
+
+[X] Install and configure Tailwind CSS
+    [X] Install Tailwind CSS and Vite plugin using `bun`.
+    [X] Create/Update `nuxt.config.ts` with Vite plugin.
+    [X] Create `assets/css/main.css`.
+    [X] Add CSS file path to `nuxt.config.ts`.
+
+[X] Add Nuxt modules
+    [X] Install `@vueuse/nuxt`, `nuxt-icon`, and `@nuxt/image` using `bun`.
+    [X] Add modules to `nuxt.config.ts`. 
