@@ -138,5 +138,11 @@ export interface Entity {
    * Optional opening hours information.
    * Could be a string representation or a more structured object later.
    */
-  openingHours?: string; 
+  openingHours?: string;
+  /**
+   * Optional distance from the user's location.
+   * This is typically calculated dynamically and added when displaying results.
+   * Stored as string to match the format from `getRandomDistance` (e.g., "1.6").
+   */
+  distance?: string; 
 } 
