@@ -145,4 +145,10 @@ export interface Entity {
    * Stored as string to match the format from `getRandomDistance` (e.g., "1.6").
    */
   distance?: string; 
+  /**
+   * Optional array of tags for more granular classification or searching.
+   * E.g., ['fast food', 'chicken', 'drive-thru'] for KFC
+   * E.g., ['private', 'specialist', 'cardiology'] for a clinic
+   */
+  tags?: string[]; 
 } 

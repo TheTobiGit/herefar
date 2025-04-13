@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="flex"
+    class="flex mb-4"
     :class="{ 'justify-end': message.isUser }"
   >
     <!-- User message bubble (right aligned) -->
@@ -11,20 +11,22 @@
     </div>
     
     <!-- Response message bubble (left aligned) - Includes optional place results -->
-    <div v-else 
-      class="max-w-[75%] bg-[#25262B] text-gray-200 px-4 py-2.5 rounded-lg border border-[#313236] shadow-sm"
-    >
-      <p>{{ message.text }}</p>
+    <div v-else class="max-w-[75%]">
+      <!-- Text message -->
+      <div v-if="message.text" 
+        class="bg-[#25262B] text-gray-200 px-4 py-2.5 rounded-lg border border-[#313236] shadow-sm mb-3"
+      >
+        <p>{{ message.text }}</p>
+      </div>
       
       <!-- Place search results -->
       <div v-if="message.hasPlaceResults && message.placeResults && message.placeResults.length > 0" 
-        class="mt-3 space-y-2"
+        class="space-y-2"
       >
-        <!-- Use a more unique key if needed -->
         <PlaceCard 
-          v-for="(place, placeIndex) in message.placeResults" 
-          :key="`${message.time}-${placeIndex}`"
-          :entity="place"
+          v-for="place in message.placeResults" 
+          :key="place.id || `place-${$index}`"
+          :entity="place" 
           size="small" 
         />
       </div>

@@ -1,6 +1,8 @@
 import { ref } from 'vue'; // Import ref explicitly for composables
-import type { Entity, EntityCategory } from '~/types/Entity';
+import type { Entity } from '~/types/Entity';
 import { dummyEntities } from '~/data/entities';
+import { useIntentRecognizer } from './useIntentRecognizer'; // Import the intent recognizer
+import type { IntentRecognitionResult } from './useIntentRecognizer'; // Import the result type
 
 // Define message interface within the composable
 // (Could be moved to types/index.ts later if needed elsewhere)
@@ -17,6 +19,18 @@ interface Message {
 const getRandomDistance = () => (Math.random() * 2 + 0.1).toFixed(1);
 
 /**
+ * Utility function to get the current time formatted as HH:MM AM/PM.
+ */
+const getCurrentTimeFormatted = (): string => {
+  const now = new Date();
+  return now.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+};
+
+/**
  * Composable for managing chat state and interactions.
  */
 export const useChat = () => {
@@ -25,118 +39,113 @@ export const useChat = () => {
   const isTyping = ref(false);
   const messageInput = ref('');
 
-  // --- Helper Functions --- 
-
-  // Helper function to format current time for messages
-  const getCurrentTimeFormatted = () => {
-    const now = new Date();
-    return now.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false 
-    });
-  };
+  // Get the intent recognizer function
+  const { recognizeIntent } = useIntentRecognizer();
   
   // --- Core Logic --- 
 
-  // Simulate a response (incorporating place search logic)
+  // Updated simulateResponse to use dynamic intro text for food
   const simulateResponse = (userMessageText: string) => {
-    // Show typing indicator
     isTyping.value = true;
-    
-    // Use the passed user message text
-    const userMessage = userMessageText.toLowerCase();
-    
-    // Search delay duration
-    const delayDuration = 1500; // Slightly shorter delay now
-    
-    // Simulate response delay
+    const delayDuration = 1500;
+
     setTimeout(() => {
-      // Hide typing indicator
       isTyping.value = false;
-      
-      // Check if user is searching for a place (simple keyword detection)
-      const placeKeywords = [
-        'hospital', 'clinic', 'doctor', 'medical', 'pharmacy',
-        'police', 'security', 'fire', 'station', 'emergency',
-        'restaurant', 'food', 'cafe', 'kfc', 'dining', 'eat',
-        'bank', 'atm', 'financial', 'money', 'cash',
-        'school', 'university', 'college', 'education',
-        'hotel', 'hostel', 'accommodation', 'staying',
-        'shop', 'mall', 'store', 'market', 'retail', 'shopping',
-        'government', 'ministry', 'municipal',
-        'gas', 'petrol', 'electric', 'water', 'utility',
-        'bus', 'taxi', 'transport', 'train'
-      ];
-      
-      const isPlaceSearch = placeKeywords.some(keyword => userMessage.includes(keyword));
-      
-      // Search in entity names directly
-      const nameSearchResults = dummyEntities.filter(entity => 
-        entity.name.toLowerCase().includes(userMessage)
-      );
-      
-      // Determine response type
-      if (nameSearchResults.length > 0 || isPlaceSearch) {
-        let relevantEntities: Entity[] = [];
-        
-        if (nameSearchResults.length > 0) {
-          relevantEntities = nameSearchResults;
-        } else {
-          const categoryMap: Record<string, EntityCategory[]> = {
-             // ... (keep the categoryMap as defined before) ...
-             'hospital': ['Medical'], 'clinic': ['Medical'], 'doctor': ['Medical'], 'medical': ['Medical'],
-             'police': ['Security'], 'security': ['Security'], 'station': ['Security', 'Transport'], 'emergency': ['Security', 'Medical'],
-             'restaurant': ['Food'], 'food': ['Food'], 'cafe': ['Food'], 'kfc': ['Food'], 'dining': ['Food'], 'eat': ['Food'],
-             'bank': ['Financial'], 'atm': ['Financial'], 'financial': ['Financial'], 'money': ['Financial'], 'cash': ['Financial'],
-             'school': ['Education'], 'university': ['Education'], 'college': ['Education'], 'education': ['Education'],
-             'hotel': ['Accommodation'], 'hostel': ['Accommodation'], 'accommodation': ['Accommodation'], 'staying': ['Accommodation'],
-             'shop': ['Retail'], 'mall': ['Retail'], 'store': ['Retail'], 'market': ['Retail'], 'retail': ['Retail'], 'shopping': ['Retail'],
-             'government': ['Government'], 'ministry': ['Government'], 'municipal': ['Government'],
-             'gas': ['Utility'], 'petrol': ['Utility'], 'electric': ['Utility'], 'water': ['Utility'], 'utility': ['Utility'],
-             'bus': ['Transport'], 'taxi': ['Transport'], 'transport': ['Transport'], 'train': ['Transport']
-          };
-          const relevantCategories = new Set<EntityCategory>();
-          for (const [keyword, categories] of Object.entries(categoryMap)) {
-            if (userMessage.includes(keyword)) {
-              categories.forEach(category => relevantCategories.add(category));
-            }
-          }
+      const recognitionResult: IntentRecognitionResult = recognizeIntent(userMessageText);
+      let responseMessage: Message;
+
+      switch (recognitionResult.intent) {
+        case 'find_food':
+          let foodEntities = dummyEntities.filter(entity => entity.category === 'Food');
+          foodEntities = foodEntities.map(entity => ({ ...entity, distance: getRandomDistance() })).slice(0, 3);
           
-          if (relevantCategories.size > 0) {
-            relevantEntities = dummyEntities.filter(entity => 
-              relevantCategories.has(entity.category)
-            );
+          // Array of possible introductory phrases for food results
+          const foodIntroPhrases = [
+            "Here are some places to get food nearby:",
+            "Found a few spots to eat:",
+            "You could eat at one of these places:",
+            "Check out these food options:",
+          ];
+          
+          // Randomly select an intro phrase
+          const randomFoodIntro = foodIntroPhrases[Math.floor(Math.random() * foodIntroPhrases.length)];
+          
+          responseMessage = {
+            text: foodEntities.length > 0 
+              ? randomFoodIntro // Use the randomly selected phrase
+              : 'Sorry, I couldn\'t find any specific food places right now.', 
+            isUser: false,
+            time: getCurrentTimeFormatted(),
+            hasPlaceResults: foodEntities.length > 0,
+            placeResults: foodEntities.length > 0 ? foodEntities : undefined
+          };
+          break;
+
+        case 'find_by_tag':
+          // Filter entities by the extracted tag (case-insensitive)
+          const tagToSearch = recognitionResult.extractedTag?.toLowerCase();
+          let taggedEntities = tagToSearch
+            ? dummyEntities.filter(entity =>
+                entity.tags?.some(tag => tag.toLowerCase() === tagToSearch)
+              )
+            : [];
+
+          // Add distance and limit results
+          taggedEntities = taggedEntities.map(entity => ({ ...entity, distance: getRandomDistance() })).slice(0, 5); // Show up to 5 results for tags
+
+          responseMessage = {
+            text: taggedEntities.length > 0
+              ? `Okay, I found these places tagged with \'${recognitionResult.extractedTag}\':` // Use original casing of tag
+              : `Sorry, I couldn\'t find any places tagged with \'${recognitionResult.extractedTag}\'.`,
+            isUser: false,
+            time: getCurrentTimeFormatted(),
+            hasPlaceResults: taggedEntities.length > 0,
+            placeResults: taggedEntities.length > 0 ? taggedEntities : undefined
+          };
+          break;
+
+        case 'find_specific_place':
+          const matchedEntity = recognitionResult.matchedEntity;
+          if (matchedEntity) {
+            // Add distance to the single matched entity
+            const entityWithDistance = { ...matchedEntity, distance: getRandomDistance() };
+            responseMessage = {
+              text: '', // Remove text entirely, name is in the card
+              isUser: false,
+              time: getCurrentTimeFormatted(),
+              hasPlaceResults: true,
+              placeResults: [entityWithDistance] // Array containing the single entity
+            };
           } else {
-            // Fallback if keywords detected but no specific category matched
-            relevantEntities = dummyEntities.sort(() => 0.5 - Math.random()).slice(0, 3);
+            // This case shouldn't ideally happen if recognizer works correctly, but good to have a fallback
+            responseMessage = {
+              text: "Sorry, I couldn't find the specific place you mentioned.",
+              isUser: false,
+              time: getCurrentTimeFormatted(),
+            };
           }
-        }
-        
-        // Add distance and limit results
-        relevantEntities = relevantEntities.map(entity => ({ ...entity, distance: getRandomDistance() })).slice(0, 3);
-        
-        // Add place results message
-        messages.value.push({
-          text: relevantEntities.length > 0 
-            ? `Here are some ${relevantEntities[0].category.toLowerCase()} places I found:` 
-            : "Sorry, I couldn't find specific places for that. Here are some nearby options:",
-          isUser: false,
-          time: getCurrentTimeFormatted(),
-          hasPlaceResults: true,
-          placeResults: relevantEntities.length > 0 ? relevantEntities : dummyEntities.sort(() => 0.5 - Math.random()).slice(0, 3) // Show random if no specific found
-        });
-      } else {
-        // Default response
-        messages.value.push({
-          text: "Okay, how can I assist you further?", // More neutral default
-          isUser: false,
-          time: getCurrentTimeFormatted()
-        });
+          break;
+
+        // case 'find_emergency':
+        //   // ... implementation ...
+        //   break;
+        // case 'specific_place_search':
+        //   // ... implementation ...
+        //   break;
+
+        default: // 'unknown' intent
+          responseMessage = {
+            text: "Sorry, I didn't quite understand that. Could you please rephrase?", // Updated fallback message
+            isUser: false,
+            time: getCurrentTimeFormatted(),
+          };
+          break;
       }
+
+      messages.value.push(responseMessage);
       
-      // TODO: Trigger scroll to bottom from the component after this message is added
-      
+      // TODO: Trigger scroll from component
+
     }, delayDuration);
   };
 
@@ -158,7 +167,7 @@ export const useChat = () => {
     // Clear input
     messageInput.value = '';
     
-    // TODO: Trigger scroll to bottom from the component after user message added
+    // TODO: Trigger scroll from component
 
     // Simulate AI response after a short delay
     setTimeout(() => simulateResponse(userMessageText), 300); 
