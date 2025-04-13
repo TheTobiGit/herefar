@@ -69,8 +69,8 @@
           </TransitionGroup>
         </section>
         
-        <!-- Recent Section -->
-        <section>
+        <!-- Recent Section - added margin-top class -->
+        <section class="mt-8">
           <Transition name="fade-slide">
             <h2 v-if="isMounted" class="text-sm font-medium text-gray-400 mb-3" :style="{ transitionDelay: `${150 + nearbyPlaces.length * 50}ms` }">Recent</h2>
           </Transition>
@@ -122,14 +122,119 @@
               class="max-w-[75%] bg-[#25262B] text-gray-200 px-4 py-2.5 rounded-lg border border-[#313236] shadow-sm"
             >
               <p>{{ message.text }}</p>
-              <!-- Timestamp removed -->
             </div>
             
-            <!-- Response message bubble will go here later -->
+            <!-- Response message bubble (left aligned) -->
+            <div v-else 
+              class="max-w-[75%] bg-[#25262B] text-gray-200 px-4 py-2.5 rounded-lg border border-[#313236] shadow-sm"
+            >
+              <p>{{ message.text }}</p>
+            </div>
           </div>
         </TransitionGroup>
+        
+        <!-- Typing indicator (shows when isTyping is true) - updated to remove container -->
+        <Transition name="fade">
+          <div v-if="isTyping" class="flex mt-2 ml-2">
+            <div class="typing-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </Transition>
       </div>
     </main>
+    
+    <!-- Advanced Search Panel - shows when isAdvancedSearchOpen is true -->
+    <Transition name="slide-up">
+      <div v-if="isAdvancedSearchOpen" class="fixed inset-x-0 bottom-24 p-4 z-10">
+        <div class="bg-[#25262B] border border-[#313236] rounded-lg p-4 shadow-lg max-h-[70vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-sm font-medium text-gray-300">Advanced Search</h2>
+            <button @click="isAdvancedSearchOpen = false" class="text-gray-500 hover:text-gray-300">
+              <Icon name="heroicons:x-mark" class="w-5 h-5" />
+            </button>
+          </div>
+          
+          <!-- Categories Filter -->
+          <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-2">Categories</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button 
+                v-for="category in categories" 
+                :key="category.id"
+                @click="toggleCategory(category.id)"
+                class="p-2 rounded-md text-xs flex items-center justify-center gap-1 transition-colors duration-150"
+                :class="selectedCategories.includes(category.id) 
+                  ? `${getCategoryBgColor(category.id)} ${getCategoryTextColor(category.id)} border-transparent` 
+                  : 'bg-[#1E1F23] text-gray-400 border border-[#313236]'"
+              >
+                <Icon :name="getCategoryIcon(category.id)" class="w-3.5 h-3.5" />
+                <span>{{ category.name.split(' ')[0] }}</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Distance Range -->
+          <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-2">Maximum Distance (km)</label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="range" 
+                v-model="maxDistance" 
+                min="1" 
+                max="10" 
+                step="1"
+                class="w-full accent-blue-500"
+              />
+              <span class="text-xs text-gray-300 min-w-[30px]">{{ maxDistance }}km</span>
+            </div>
+          </div>
+          
+          <!-- Verified Only Toggle -->
+          <div class="mb-4">
+            <div class="flex items-center">
+              <button 
+                @click="verifiedOnly = !verifiedOnly"
+                class="w-5 h-5 rounded border mr-2 flex items-center justify-center transition-colors duration-150"
+                :class="verifiedOnly ? 'bg-blue-500 border-blue-600' : 'bg-[#1E1F23] border-[#313236]'"
+              >
+                <Icon v-if="verifiedOnly" name="heroicons:check" class="w-3.5 h-3.5 text-white" />
+              </button>
+              <label class="text-xs text-gray-400">Verified places only</label>
+            </div>
+          </div>
+          
+          <!-- Keywords -->
+          <div class="mb-4">
+            <label class="block text-xs text-gray-500 mb-2">Keywords</label>
+            <input 
+              type="text" 
+              v-model="keywords"
+              placeholder="Enter keywords..."
+              class="w-full px-3 py-2 rounded-md bg-[#1E1F23] border border-[#313236] focus:border-[#4D4F59] focus:outline-none text-gray-300 text-sm placeholder-gray-500"
+            />
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-2 mt-4">
+            <button 
+              @click="resetAdvancedSearch"
+              class="px-3 py-1.5 rounded-md bg-[#1E1F23] border border-[#313236] text-gray-400 text-xs hover:border-[#4D4F59] transition-colors duration-150"
+            >
+              Reset
+            </button>
+            <button 
+              @click="applyAdvancedSearch"
+              class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs hover:bg-blue-500 transition-colors duration-150"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
     
     <!-- Input area -->
     <footer class="fixed bottom-0 left-0 right-0 p-4 bg-[#1A1B1E] shadow-lg">
@@ -153,10 +258,14 @@
               <Icon name="heroicons:microphone" class="w-5 h-5" />
             </button>
             
-            <!-- Search Button -->
-            <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#25262B] border border-[#313236] hover:border-[#4D4F59] text-xs text-gray-300 transition-all duration-150">
-              <Icon name="heroicons:magnifying-glass" class="w-4 h-4 text-gray-400" /> 
-              <span>Search</span>
+            <!-- Advanced Search Button - updated from Search -->
+            <button 
+              @click="toggleAdvancedSearch"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#25262B] border border-[#313236] hover:border-[#4D4F59] text-xs text-gray-300 transition-all duration-150"
+              :class="{ 'border-blue-500': isAdvancedSearchOpen }"
+            >
+              <Icon name="heroicons:adjustments-horizontal" class="w-4 h-4 text-blue-400" /> 
+              <span>Advanced Search</span>
             </button>
             
             <!-- Location Button -->
@@ -200,6 +309,9 @@ const isMounted = ref(false);
 
 // Chat messages array
 const messages = ref<Message[]>([]);
+
+// Typing indicator state
+const isTyping = ref(false);
 
 // Current time and date
 const currentTime = ref('');
@@ -287,6 +399,29 @@ const getCurrentTimeFormatted = () => {
   });
 };
 
+// Simulate a response from the AI (To be implemented later)
+const simulateResponse = () => {
+  // Show typing indicator
+  isTyping.value = true;
+  
+  // Simulate response delay
+  setTimeout(() => {
+    // Hide typing indicator
+    isTyping.value = false;
+    
+    // Add a response message
+    // This will be replaced with actual response logic later
+    messages.value.push({
+      text: "I understand you're looking for information. How can I help you?",
+      isUser: false,
+      time: getCurrentTimeFormatted()
+    });
+    
+    // Scroll to bottom after response
+    setTimeout(scrollToBottom, 100);
+  }, 2000); // 2 second delay to show typing indicator
+};
+
 // Handle sending a message
 const sendMessage = () => {
   if (!messageInput.value.trim()) return;
@@ -298,18 +433,14 @@ const sendMessage = () => {
     time: getCurrentTimeFormatted()
   });
   
-  // Will add AI response later
-  // For now, just log to console
-  console.log('Message sent:', messageInput.value);
-  
   // Clear input after sending
   messageInput.value = '';
   
-  // Scroll to bottom of chat (will implement later)
-  // Need to wait for DOM update
-  setTimeout(() => {
-    scrollToBottom();
-  }, 100);
+  // Scroll to bottom to show user message
+  setTimeout(scrollToBottom, 100);
+  
+  // Simulate AI response
+  simulateResponse();
 };
 
 // Scroll to bottom of chat
@@ -376,6 +507,84 @@ const getCategoryTextColor = (category: EntityCategory): string => {
   };
   
   return colorMap[category] || colorMap.Other;
+};
+
+// Advanced search state
+const isAdvancedSearchOpen = ref(false);
+const selectedCategories = ref<EntityCategory[]>([]);
+const maxDistance = ref(5);
+const verifiedOnly = ref(false);
+const keywords = ref('');
+
+// Categories list for advanced search - using same data from explore.vue
+const categories: { id: EntityCategory; name: string }[] = [
+  { id: 'Medical', name: 'Medical' },
+  { id: 'Security', name: 'Security' },
+  { id: 'Transport', name: 'Transport' },
+  { id: 'Food', name: 'Food & Dining' },
+  { id: 'Government', name: 'Government' },
+  { id: 'Financial', name: 'Financial' },
+  { id: 'Education', name: 'Education' },
+  { id: 'Utility', name: 'Utilities' },
+  { id: 'Accommodation', name: 'Accommodation' },
+  { id: 'Retail', name: 'Shopping' },
+  { id: 'Entertainment', name: 'Entertainment' },
+  { id: 'Other', name: 'More' },
+];
+
+// Toggle advanced search panel
+const toggleAdvancedSearch = () => {
+  isAdvancedSearchOpen.value = !isAdvancedSearchOpen.value;
+};
+
+// Toggle category selection
+const toggleCategory = (category: EntityCategory) => {
+  if (selectedCategories.value.includes(category)) {
+    selectedCategories.value = selectedCategories.value.filter(c => c !== category);
+  } else {
+    selectedCategories.value.push(category);
+  }
+};
+
+// Reset advanced search filters
+const resetAdvancedSearch = () => {
+  selectedCategories.value = [];
+  maxDistance.value = 5;
+  verifiedOnly.value = false;
+  keywords.value = '';
+};
+
+// Apply advanced search
+const applyAdvancedSearch = () => {
+  // When we click search, we'll close the panel and send a formatted message
+  isAdvancedSearchOpen.value = false;
+  
+  // Build search message based on selected filters
+  let searchMessage = 'Search for';
+  
+  if (selectedCategories.value.length > 0) {
+    if (selectedCategories.value.length === 1) {
+      searchMessage += ` ${selectedCategories.value[0]}`;
+    } else {
+      const lastCategory = selectedCategories.value.pop();
+      searchMessage += ` ${selectedCategories.value.join(', ')} and ${lastCategory}`;
+      selectedCategories.value.push(lastCategory as EntityCategory); // Add back for state
+    }
+  }
+  
+  if (keywords.value.trim()) {
+    searchMessage += ` with "${keywords.value.trim()}"`;
+  }
+  
+  searchMessage += ` within ${maxDistance.value}km`;
+  
+  if (verifiedOnly.value) {
+    searchMessage += ' (verified only)';
+  }
+  
+  // Set message input and trigger send
+  messageInput.value = searchMessage;
+  sendMessage();
 };
 
 // SEO configuration
@@ -455,5 +664,69 @@ main::-webkit-scrollbar-thumb:hover {
 /* Move transition for smooth reordering */
 .fade-slide-list-move {
   transition: transform 0.4s ease;
+}
+
+/* Simple fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Typing dots animation - updated for better visibility on page */
+.typing-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  width: 40px;
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #6E7380; /* Slightly brighter for visibility on dark background */
+  margin: 0 2px;
+  opacity: 0.8;
+  animation: typingDot 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingDot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Slide up animation for advanced search panel */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
 }
 </style>
