@@ -69,7 +69,8 @@
           name="fade-slide-list"
           class="space-y-4"
         >
-          <ChatMessageBubbleV1 
+          <!-- Use standard Chat Message Bubble -->
+          <ChatMessageBubble 
             v-for="(message, index) in messages" 
             :key="index" 
             :message="message" 
@@ -77,7 +78,7 @@
           />
         </TransitionGroup>
         
-        <!-- Typing indicator (shows when isTyping is true) - updated to remove container -->
+        <!-- Typing indicator (shows when isTyping is true) -->
         <Transition name="fade">
           <div v-if="isTyping" class="flex mt-2 ml-2">
             <div class="typing-dots">
@@ -90,8 +91,8 @@
       </div>
     </main>
     
-    <!-- Input area - Use the V1 component -->
-    <ChatInputFooterV1 
+    <!-- Input area - Use the standard component -->
+    <ChatInputFooter 
       v-model:messageInput="messageInput" 
       @sendMessage="sendMessage"
     />
@@ -99,28 +100,35 @@
 </template>
 
 <script setup lang="ts">
-// Import Vue parts
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'; 
-
-// Import Composables
-import { useCategoryStyles } from '~/composables/useCategoryStyles';
-import { useChatV1 } from '~/composables/useChatV1'; // Import the V1 chat composable
-import { usePageInfo } from '~/composables/usePageInfo'; // Import usePageInfo
-
-// Import Components
-import PlaceCard from '~/components/PlaceCard.vue';
-import ChatMessageBubbleV1 from '~/components/ChatMessageBubbleV1.vue'; // Import the V1 chat bubble component
-import ChatInputFooterV1 from '~/components/ChatInputFooterV1.vue'; // Import the V1 chat input footer component
-import TopInfoBar from '~/components/TopInfoBar.vue';
-
 // Import types and data
-import type { EntityCategory } from '~/types/Entity';
+import type { EntityCategory, Entity } from '~/types/Entity'; // Import Entity type
+import type { Message } from '~/types/Chat'; // Import Message type
 
 // Get category styling functions from the composable
 const { getCategoryIcon, getCategoryBgColor, getCategoryTextColor } = useCategoryStyles();
 
-// Use the V1 chat composable
-const { messages, isTyping, messageInput, sendMessage, showExpandedPlace } = useChatV1();
+// --- Chat State (Placeholder - Using standard names) ---
+// TODO: Replace with actual implementation from useChat once it's developed
+const messages = ref<Message[]>([]); // Placeholder for messages
+const isTyping = ref(false); // Placeholder for typing indicator
+const messageInput = ref(''); // Placeholder for input
+
+// Placeholder functions to avoid errors - replace with useChat output
+const sendMessage = () => {
+  console.log('Send message (Placeholder):', messageInput.value);
+  if (!messageInput.value.trim()) return;
+  // Basic simulation: Add user message and clear input
+  messages.value.push({ text: messageInput.value, isUser: true, time: new Date().toLocaleTimeString() });
+  messageInput.value = '';
+  // TODO: Integrate with useChat logic
+};
+
+const showExpandedPlace = (entity: Entity) => {
+  console.log('Show expanded place (Placeholder):', entity);
+  // TODO: Integrate with useChat logic
+};
+
+// --- End Chat State Placeholder ---
 
 // Use Page Info composable
 const { 

@@ -1,3 +1,5 @@
+import type { GhanaRegion } from './Geography'; // Import GhanaRegion type
+
 /**
  * Represents the broad categories an entity can belong to.
  * Using a string union for flexibility and encompassing various entity types.
@@ -156,163 +158,256 @@ export type AnySubCategory =
   | OtherSubCategory;
 
 /**
- * Represents contact information for an entity.
+ * Details specific to Medical entities.
  */
-export interface ContactInfo {
-  /**
-   * Primary phone number, potentially verified to avoid scams.
-   * Stored as a string to accommodate various formats (+country code, extensions).
-   */
-  phone?: string; 
-  /**
-   * Secondary or alternative phone numbers.
-   */
-  additionalPhones?: string[];
-  /**
-   * Official website URL.
-   */
-  website?: string;
-  /**
-   * Email address.
-   */
-  email?: string;
+export interface MedicalEntityDetails {
+  bedCount?: number | null;
+  specializations?: string | string[];
+  offersEmergencyServices?: boolean;
 }
 
 /**
- * Represents the geographical location of an entity.
+ * Details specific to Security entities.
  */
-export interface Location {
-  /**
-   * Street address line 1.
-   */
-  addressLine1: string;
-  /**
-   * Street address line 2 (optional).
-   */
-  addressLine2?: string;
-  /**
-   * City or town.
-   */
-  city: string;
-  /**
-   * State, province, or region.
-   */
-  stateProvince: string;
-  /**
-   * Postal code.
-   */
-  postalCode: string;
-  /**
-   * Country.
-   */
-  country: string;
-  /**
-   * Latitude coordinate.
-   */
-  latitude?: number;
-  /**
-   * Longitude coordinate.
-   */
-  longitude?: number;
+export interface SecurityEntityDetails {
+  serviceType?: string; // Consider linking to SecuritySubCategory if appropriate
+  responseTime?: string | null; // e.g., "10 minutes"
 }
 
 /**
- * Represents a physical place, organization, or service.
+ * Details specific to Utility entities.
+ */
+export interface UtilityEntityDetails {
+  providerName?: string; // e.g., "MTN Ghana"
+  serviceArea?: string; // e.g., "Kumasi Metro"
+}
+
+/**
+ * Details specific to Transport entities.
+ */
+export interface TransportEntityDetails {
+  routes?: string | string[]; // e.g., "Accra-Kumasi"
+  capacity?: number | null; // e.g., 500 (daily passengers)
+}
+
+/**
+ * Details specific to Food entities.
+ */
+export interface FoodEntityDetails {
+  cuisineType?: string; // e.g., "Ghanaian", "Continental"
+  deliveryAvailable?: boolean;
+}
+
+/**
+ * Details specific to Entertainment entities.
+ */
+export interface EntertainmentEntityDetails {
+  eventTypes?: string | string[]; // e.g., "Movies", "Live Music"
+  ticketPrice?: string | null; // e.g., "GHS 30", "Free Entry"
+}
+
+/**
+ * Details specific to Financial entities.
+ */
+export interface FinancialEntityDetails {
+  servicesOffered?: string | string[]; // e.g., ["Loans", "Savings Account", "Investment"]
+  atmNetwork?: string | null; // e.g., "Visa", "Mastercard", "gh-link"
+}
+
+/**
+ * Details specific to Government entities.
+ */
+export interface GovernmentEntityDetails {
+  parentDepartment?: string; // e.g., "Ministry of Finance"
+  servicesProvided?: string | string[]; // e.g., "Tax Filing", "Passport Application"
+}
+
+/**
+ * Details specific to Education entities.
+ */
+export interface EducationEntityDetails {
+  gradeLevels?: string | string[]; // e.g., "Primary", "JHS", "SHS", "Tertiary"
+  enrollment?: number | null;
+}
+
+/**
+ * Details specific to Accommodation entities.
+ */
+export interface AccommodationEntityDetails {
+  roomCount?: number | null;
+  amenities?: string | string[]; // e.g., ["Wi-Fi", "Pool", "Gym"]
+}
+
+/**
+ * Details specific to Retail entities.
+ */
+export interface RetailEntityDetails {
+  storeType?: string; // e.g., "Electronics", "Clothing", "Supermarket"
+  brandsCarried?: string | string[]; // e.g., ["Samsung", "Apple", "LG"]
+}
+
+/**
+ * Details specific to Religious entities.
+ */
+export interface ReligiousEntityDetails {
+  denomination?: string | null; // e.g., "Catholic", "Methodist", "Sunni"
+  serviceTimes?: string; // e.g., "Sundays 9AM & 11AM", "Fridays 1PM"
+}
+
+/**
+ * Union type for all possible category-specific details.
+ */
+export type AnyCategoryDetails =
+  | MedicalEntityDetails
+  | SecurityEntityDetails
+  | UtilityEntityDetails
+  | TransportEntityDetails
+  | FoodEntityDetails
+  | EntertainmentEntityDetails
+  | FinancialEntityDetails
+  | GovernmentEntityDetails
+  | EducationEntityDetails
+  | AccommodationEntityDetails
+  | RetailEntityDetails
+  | ReligiousEntityDetails;
+
+/**
+ * Represents a physical place, organization, or service (V2 Definition).
  * This is the core data model for most searchable items in the app.
  */
 export interface Entity {
   /**
-   * Unique identifier for the entity.
+   * Unique identifier for the entity (UUID or Integer).
+   * @example "ent-12345", 98765
    */
-  id: string; 
+  id: string | number; // Using string | number for flexibility
+
   /**
-   * The official name of the entity (e.g., "KFC - Osu Branch", "Accra Regional Hospital").
+   * Links to the parent entity's ID for branches (nullable for standalone/parent entities).
+   * @example "ent-parent-678", null
+   */
+  parentId?: string | number | null;
+
+  /**
+   * The primary display name of the entity.
+   * @example "Bolt Accra", "Korle-Bu Teaching Hospital"
    */
   name: string;
+
   /**
    * The broad category the entity belongs to.
-   * Helps in filtering and searching.
+   * @example "Transport", "Medical"
    */
   category: EntityCategory;
+
   /**
-   * Optional sub-category for more specific classification.
-   * Uses the union type `AnySubCategory` for type safety.
+   * Specific type within the category.
+   * @example "Ride-Sharing", "Hospital"
    */
   subCategory?: AnySubCategory;
+
   /**
-   * A brief description of the entity.
-   */
-  description?: string;
-  /**
-   * Contact details for the entity.
-   */
-  contact: ContactInfo;
-  /**
-   * Physical location details.
-   */
-  location: Location;
-  /**
-   * Specific details for emergency services (relevant if category is 'Security' or 'Medical').
-   */
-  emergencyDetails?: {
-    /**
-     * Type of emergency service (e.g., 'police', 'fire', 'ambulance').
-     */
-    serviceType: string;
-    /**
-     * Direct emergency contact number.
-     */
-    emergencyNumber: string;
-  };
-  /**
-   * URL to an image/logo for the entity.
-   * To be used with <NuxtImage>.
-   */
-  imageUrl?: string;
-  /**
-   * Flag indicating if the contact information is verified.
-   * Important for preventing scams (e.g., for food delivery calls).
-   */
-  isVerified?: boolean;
-  /**
-   * Optional opening hours information.
-   * Could be a string representation or a more structured object later.
-   */
-  openingHours?: string;
-  /**
-   * Optional distance from the user's location.
-   * This is typically calculated dynamically and added when displaying results.
-   * Stored as string to match the format from `getRandomDistance` (e.g., "1.6").
-   */
-  distance?: string; 
-  /**
-   * Optional array of tags for more granular classification or searching.
-   * E.g., ['fast food', 'chicken', 'drive-thru'] for KFC
-   * E.g., ['private', 'specialist', 'cardiology'] for a clinic
+   * Array of descriptive keywords for enhanced search.
+   * @example ["24-hour", "mobile-app"], ["emergency", "public"]
    */
   tags?: string[];
-  
+
   /**
-   * For entities that are parent organizations (e.g., KFC as a brand).
-   * Contains branch IDs that reference child entities.
+   * Full physical address.
+   * @example "Spintex Road, Accra, Greater Accra Region, Ghana"
    */
-  branches?: string[];
-  
+  address: string;
+
   /**
-   * For branch entities, references the parent entity ID.
-   * If not specified, the entity is considered a standalone or parent entity.
+   * Geographic latitude coordinate.
+   * @example 5.6281
    */
-  parentId?: string;
+  latitude?: number;
+
+  /**
+   * Geographic longitude coordinate.
+   * @example -0.1752
+   */
+  longitude?: number;
+
+  /**
+   * The administrative region in Ghana the entity belongs to.
+   * @example "Greater Accra"
+   */
+  region: GhanaRegion;
+
+  /**
+   * Primary contact phone number(s). Could be an array if multiple primary numbers exist.
+   * Stored as string to accommodate various formats.
+   * @example "+233 302 123 456", ["+233 302 123 456", "+233 302 987 654"]
+   */
+  phoneNumber?: string | string[];
+
+  /**
+   * Contact email address (nullable).
+   * @example "support@bolt.eu", null
+   */
+  email?: string | null;
+
+  /**
+   * Official website URL (nullable).
+   * @example "https://bolt.eu/en-gh/", null
+   */
+  website?: string | null;
+
+  /**
+   * Hours of operation (text description).
+   * @example "Mon-Fri 9:00 AM - 5:00 PM", "24/7"
+   */
+  operatingHours?: string;
+
+  /**
+   * Array of URLs pointing to photos of the entity (stored externally).
+   * @example ["https://herefar.s3.com/korlebu1.jpg", "https://herefar.s3.com/korlebu_entrance.jpg"]
+   */
+  photos?: string[];
+
+  /**
+   * Indicates if the entity's data is officially verified.
+   * @example true, false
+   */
+  verifiedStatus?: boolean;
+
+  /**
+   * Map of social media platform names to profile URLs/handles.
+   * @example { "twitter": "@KorleBuHospital", "facebook": "https://facebook.com/KorleBuTH" }
+   */
+  socialMediaLinks?: Record<string, string>;
+
+  /**
+   * Timestamp indicating when the entity data was last updated/verified.
+   * @example "2025-04-01T10:00:00Z"
+   */
+  lastUpdated?: string; // Using string for ISO 8601 format compatibility
   
   /**
-   * For branch entities, specifies the branch location name (e.g., "Osu", "Spintex").
-   * Used for display and search purposes.
+   * Optional field containing details specific to the entity's category.
+   */
+  categoryDetails?: AnyCategoryDetails;
+  
+  // --- Fields retained for Parent/Branch Structure (Consider if needed alongside parentId) ---
+  
+  /**
+   * Optional: Contains IDs of child branch entities. Useful for parent entities.
+   * Consider if `parentId` lookup is sufficient.
+   * @deprecated Use `parentId` lookup on other entities instead if possible.
+   */
+  branches?: (string | number)[];
+  
+  /**
+   * Optional: For branch entities, specifies the branch location name (e.g., "Osu", "Spintex").
+   * Might be redundant if included in the main `name` field (e.g., "KFC - Osu Branch").
    */
   branchName?: string;
   
   /**
-   * Flag indicating if this entity is a parent/company entity rather than a specific location.
-   * Parent entities typically represent brands or organizations with multiple branches.
+   * Optional: Flag indicating if this entity represents a brand/organization (parent) rather than a specific location.
+   * @deprecated Could potentially be inferred if `parentId` is null and `branches` exist (or via category/subCategory).
    */
   isParentEntity?: boolean;
 } 
