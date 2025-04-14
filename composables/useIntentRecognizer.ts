@@ -9,6 +9,7 @@ export type Intent =
   | 'find_food'
   | 'find_by_tag' // New intent for tag-based search
   | 'find_specific_place' // New intent for specific entity search
+  | 'find_company' // New intent for parent company/organization search
   //| 'find_emergency' // Example for future expansion
   //| 'specific_place_search' // Example for future expansion
   | 'unknown';
@@ -21,6 +22,8 @@ export interface IntentRecognitionResult {
   intent: Intent;
   extractedTag?: string; // Optional: the tag extracted from the message
   matchedEntity?: Entity; // For find_specific_place
+  matchedCompany?: Entity; // For find_company
+  relatedBranches?: Entity[]; // For branches related to a company
 }
 
 // Keywords for finding food (more natural phrases)
@@ -45,6 +48,20 @@ dummyEntities.forEach(entity => {
 // Convert Set to Array for easier iteration if needed later
 const uniqueTagsArray = Array.from(allTags);
 
+// Pre-compute parent companies and their branches for faster lookups
+const parentEntities = dummyEntities.filter(entity => entity.isParentEntity);
+const branchMap = new Map<string, Entity[]>(); // Maps parent ID to array of branch entities
+
+// Build the branch map
+parentEntities.forEach(parent => {
+  if (parent.branches) {
+    const branches = dummyEntities.filter(entity => 
+      parent.branches?.includes(entity.id)
+    );
+    branchMap.set(parent.id, branches);
+  }
+});
+
 // --- Main Recognizer Function ---
 
 /**
@@ -61,14 +78,63 @@ export const useIntentRecognizer = () => {
     }
 
     // --- Recognition Hierarchy (REVISED ORDER, IMPROVED SCORING) ---
+    
+    // 1. First, check for parent company/organization match
+    let bestCompanyMatch: Entity | null = null;
+    let bestCompanyScore = 0.0;
+    const companyMatchThreshold = 0.7; // Higher threshold for company names
+    
+    for (const company of parentEntities) {
+      const companyNameLower = company.name.toLowerCase();
+      let currentScore = 0.0;
+      
+      // a. Exact match?
+      if (companyNameLower === lowerCaseMessage) {
+        currentScore = 1.0;
+      // b. Name starts with query?
+      } else if (companyNameLower.startsWith(lowerCaseMessage)) {
+        currentScore = 0.95; // Very high score for company name starts with
+      // c. Name includes query (partial match)?
+      } else if (companyNameLower.includes(lowerCaseMessage)) {
+        currentScore = lowerCaseMessage.length / companyNameLower.length;
+        // Boost if it's a substantial part of the company name
+        if (currentScore > 0.5) {
+          currentScore += 0.2; // Additional boost
+        }
+      }
+      
+      // Update best match if current score is higher
+      if (currentScore > bestCompanyScore) {
+        bestCompanyScore = currentScore;
+        bestCompanyMatch = company;
+        // If it's an exact match, we can stop searching
+        if (currentScore === 1.0) {
+          break;
+        }
+      }
+    }
+    
+    // If a parent company match was found with good confidence,
+    // return it along with its branches
+    if (bestCompanyMatch && bestCompanyScore >= companyMatchThreshold) {
+      const branches = branchMap.get(bestCompanyMatch.id) || [];
+      return { 
+        intent: 'find_company', 
+        matchedCompany: bestCompanyMatch,
+        relatedBranches: branches
+      };
+    }
 
-    // 1. Check for entity name match (specific place search) FIRST
+    // 2. Check for specific branch or standalone entity name match
     let bestMatch: Entity | null = null;
     let bestScore = 0.0;
     const nameMatchThreshold = 0.6; // Threshold for general includes match
     const startsWithScoreBoost = 0.9; // High score if name starts with query
 
     for (const entity of dummyEntities) {
+      // Skip parent entities, we already checked them
+      if (entity.isParentEntity) continue;
+      
       const entityNameLower = entity.name.toLowerCase();
       let currentScore = 0.0;
 
@@ -77,12 +143,14 @@ export const useIntentRecognizer = () => {
         currentScore = 1.0;
       // b. Name starts with query?
       } else if (entityNameLower.startsWith(lowerCaseMessage)) {
-        // Assign a high score, potentially adjusted by length ratio for very short queries?
-        // For now, let's keep it simple and boost significantly.
         currentScore = startsWithScoreBoost;
       // c. Name includes query (partial match)?
       } else if (entityNameLower.includes(lowerCaseMessage)) {
         currentScore = lowerCaseMessage.length / entityNameLower.length;
+      }
+      // d. Check branch name too
+      else if (entity.branchName && entity.branchName.toLowerCase().includes(lowerCaseMessage)) {
+        currentScore = 0.7; // High score for branch name match
       }
 
       // Update best match if current score is higher
@@ -105,7 +173,7 @@ export const useIntentRecognizer = () => {
       }
     }
 
-    // 2. Check for exact tag match (case-insensitive) - Only if no specific place was matched
+    // 3. Check for exact tag match (case-insensitive) - Only if no specific place was matched
     if (allTags.has(lowerCaseMessage)) {
       // Use the score calculated above to decide if a specific match was strong enough
       if (!bestMatch || bestScore < nameMatchThreshold) {
@@ -114,7 +182,7 @@ export const useIntentRecognizer = () => {
       }
     }
 
-    // 3. Check for food keywords (prioritizing exact matches)
+    // 4. Check for food keywords (prioritizing exact matches)
     if (foodKeywords.some(kw => kw === lowerCaseMessage)) {
         return { intent: 'find_food' };
     }
@@ -126,7 +194,7 @@ export const useIntentRecognizer = () => {
       }
     }
 
-    // 4. Default to unknown intent
+    // 5. Default to unknown intent
     return { intent: 'unknown' };
   };
 

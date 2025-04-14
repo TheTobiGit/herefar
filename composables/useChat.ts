@@ -12,7 +12,16 @@ interface Message {
   time: string;
   hasPlaceResults?: boolean;
   placeResults?: Entity[];
+  isExpandedPlace?: boolean; // Flag for expanded place message
+  isCompanyWithBranches?: boolean; // Flag for company with branches message
+  companyEntity?: Entity; // Parent company entity for branch listings
 }
+
+// Helper function to generate placeholder URLs (Keep this if not defined elsewhere)
+const generatePlaceholderUrl = (text: string, width = 600, height = 300, bgColor = '25262B', textColor = '9CA3AF') => {
+  const encodedText = encodeURIComponent(text);
+  return `https://placehold.co/${width}x${height}/${bgColor}/${textColor}/png?text=${encodedText}`;
+};
 
 // TODO: Move getRandomDistance to a more appropriate composable (e.g., usePageInfo)
 // Temporary definition here for simulateResponse
@@ -44,7 +53,7 @@ export const useChat = () => {
   
   // --- Core Logic --- 
 
-  // Updated simulateResponse to use dynamic intro text for food
+  // Updated simulateResponse to handle all intents including companies with branches
   const simulateResponse = (userMessageText: string) => {
     isTyping.value = true;
     const delayDuration = 1500;
@@ -103,6 +112,47 @@ export const useChat = () => {
             placeResults: taggedEntities.length > 0 ? taggedEntities : undefined
           };
           break;
+          
+        case 'find_company':
+          // Handle parent company with branches
+          const company = recognitionResult.matchedCompany;
+          const branches = recognitionResult.relatedBranches || [];
+          
+          if (company && branches.length > 0) {
+            // Add distance to branches for display
+            const branchesWithDistance = branches.map(branch => ({ 
+              ...branch, 
+              distance: getRandomDistance() 
+            }));
+            
+            responseMessage = {
+              text: `Here are the ${company.name} branches:`,
+              isUser: false,
+              time: getCurrentTimeFormatted(),
+              hasPlaceResults: true,
+              placeResults: branchesWithDistance,
+              isCompanyWithBranches: true,
+              companyEntity: company
+            };
+          } else if (company) {
+            // If we have company but no branches, return the company info
+            responseMessage = {
+              text: '', // No text for direct company result
+              isUser: false,
+              time: getCurrentTimeFormatted(),
+              hasPlaceResults: true,
+              placeResults: [{ ...company, distance: getRandomDistance() }],
+              isExpandedPlace: true // Show as expanded place
+            };
+          } else {
+            // Fallback - shouldn't happen with correct intent recognition
+            responseMessage = {
+              text: "Sorry, I couldn't find any branches for that company.",
+              isUser: false,
+              time: getCurrentTimeFormatted(),
+            };
+          }
+          break;
 
         case 'find_specific_place':
           const matchedEntity = recognitionResult.matchedEntity;
@@ -114,7 +164,8 @@ export const useChat = () => {
               isUser: false,
               time: getCurrentTimeFormatted(),
               hasPlaceResults: true,
-              placeResults: [entityWithDistance] // Array containing the single entity
+              placeResults: [entityWithDistance], // Array containing the single entity
+              isExpandedPlace: true // Mark as expanded initially
             };
           } else {
             // This case shouldn't ideally happen if recognizer works correctly, but good to have a fallback
@@ -172,6 +223,42 @@ export const useChat = () => {
     // Simulate AI response after a short delay
     setTimeout(() => simulateResponse(userMessageText), 300); 
   };
+  
+  // Function to handle clicking on a simple PlaceCard
+  const showExpandedPlace = (entityId: string) => {
+    const entity = dummyEntities.find(e => e.id === entityId);
+    if (!entity) return;
+    
+    // Find and remove the original message containing this place (if multiple)
+    const originalMessageIndex = messages.value.findIndex(msg => 
+      msg.placeResults?.some(p => p.id === entityId)
+    );
+    
+    // Create a new message with just the expanded place
+    const expandedMessage: Message = {
+      text: '', // No text needed for expanded card
+      isUser: false,
+      time: getCurrentTimeFormatted(),
+      hasPlaceResults: true,
+      placeResults: [{ ...entity, distance: getRandomDistance() }], // Add distance
+      isExpandedPlace: true // Mark as expanded
+    };
+    
+    // If the original message was found, replace it
+    if (originalMessageIndex !== -1) {
+      // Check if the original message had only one place result (the one being expanded)
+      if (messages.value[originalMessageIndex].placeResults?.length === 1) {
+        messages.value.splice(originalMessageIndex, 1, expandedMessage);
+      } else {
+        // If the original message had multiple places, just add the new expanded one
+        // Maybe refine this later - remove the specific simple card?
+        messages.value.push(expandedMessage);
+      }
+    } else {
+      // If the original message wasn't found (shouldn't happen often), just add the new one
+      messages.value.push(expandedMessage);
+    }
+  };
 
   // Return reactive state and methods
   return {
@@ -179,7 +266,6 @@ export const useChat = () => {
     isTyping,
     messageInput,
     sendMessage,
-    // Not returning simulateResponse as it's internal to sendMessage
-    // Not returning scrollToBottom or getCurrentTimeFormatted as they are internal or handled elsewhere
+    showExpandedPlace // Expose the new function
   };
 }; 

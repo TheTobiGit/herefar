@@ -1,18 +1,26 @@
-// data/entities.ts
+// File: data/entities.ts
+// This file contains the structured dummy data for entities,
+// including parent companies and their branches.
 import type { Entity } from '~/types/Entity';
 
-// Helper function to generate placeholder URLs
+// Helper function to generate placeholder image URLs
+// Provides consistent visual placeholders during development.
 const generatePlaceholderUrl = (text: string, width = 600, height = 300, bgColor = '25262B', textColor = '9CA3AF') => {
+  // Encode the text to ensure it's URL-safe
   const encodedText = encodeURIComponent(text);
+  // Return the formatted placeholder URL from placehold.co
   return `https://placehold.co/${width}x${height}/${bgColor}/${textColor}/png?text=${encodedText}`;
 };
 
 /**
  * Dummy dataset for Entities.
- * This data is used for development and testing purposes before connecting to a real data source.
- * It includes examples covering various categories defined in EntityCategory.
+ * This data serves as a placeholder for development and testing
+ * before connecting to a real database or API.
+ * It includes examples covering various categories defined in EntityCategory,
+ * and demonstrates the parent-child relationship for entities with multiple branches.
  */
 export const dummyEntities: Entity[] = [
+  // === STANDALONE ENTITIES (No branches) ===
   {
     id: 'hosp-001',
     name: 'Accra Regional Hospital',
@@ -21,7 +29,7 @@ export const dummyEntities: Entity[] = [
     description: 'Major public hospital offering comprehensive medical services.',
     contact: {
       phone: '+233 30 266 4661',
-      website: 'https://examplehospital.gh' // Placeholder URL
+      website: 'https://examplehospital.gh' // Placeholder website
     },
     location: {
       addressLine1: 'Castle Road',
@@ -32,7 +40,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5560,
       longitude: -0.1969
     },
-    imageUrl: generatePlaceholderUrl('Medical - Hospital'), // Use placeholder generator
+    imageUrl: generatePlaceholderUrl('Medical - Hospital'),
     isVerified: true,
     openingHours: '24/7',
     tags: ['public hospital', 'general hospital', 'emergency', '24 hour']
@@ -59,33 +67,9 @@ export const dummyEntities: Entity[] = [
       serviceType: 'police',
       emergencyNumber: '191' // Ghana Police emergency short code
     },
-    // No imageUrl specified, will default to none
+    // No imageUrl specified intentionally for variety
     isVerified: true,
     tags: ['ghana police service', 'law enforcement', 'cantonments']
-  },
-  {
-    id: 'food-001',
-    name: 'KFC - Osu Oxford Street',
-    category: 'Food',
-    subCategory: 'Fast Food Restaurant',
-    description: 'Popular fast-food chain specializing in fried chicken.',
-    contact: {
-      phone: '+233 24 433 0000', // Example verified number
-      website: 'https://africa.kfc.com/ghana/'
-    },
-    location: {
-      addressLine1: 'Oxford Street',
-      city: 'Accra',
-      stateProvince: 'Greater Accra',
-      postalCode: 'GA-026-5432',
-      country: 'Ghana',
-      latitude: 5.5592,
-      longitude: -0.1899
-    },
-    imageUrl: generatePlaceholderUrl('KFC Osu'), // Use placeholder generator
-    isVerified: true,
-    openingHours: '10:00 AM - 11:00 PM',
-    tags: ['fast food', 'chicken', 'osu', 'takeaway', 'delivery']
   },
   {
     id: 'gov-001',
@@ -111,27 +95,6 @@ export const dummyEntities: Entity[] = [
     tags: ['government office', 'ministry', 'digitalisation']
   },
   {
-    id: 'fin-001',
-    name: 'GCB Bank - Legon Branch',
-    category: 'Financial',
-    subCategory: 'Bank',
-    description: 'Branch of Ghana Commercial Bank near the University of Ghana.',
-    contact: {
-      phone: '+233 30 250 0052' // Example number
-    },
-    location: {
-      addressLine1: 'University of Ghana Campus',
-      city: 'Accra',
-      stateProvince: 'Greater Accra',
-      postalCode: 'LG-001-9876',
-      country: 'Ghana',
-      latitude: 5.6508,
-      longitude: -0.1870
-    },
-    openingHours: '8:30 AM - 4:00 PM (Mon-Fri)',
-    tags: ['bank', 'atm', 'gcb', 'legon', 'campus']
-  },
-   {
     id: 'edu-001',
     name: 'University of Ghana',
     category: 'Education',
@@ -150,7 +113,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.6508,
       longitude: -0.1870
     },
-    imageUrl: generatePlaceholderUrl('University of Ghana'), // Use placeholder generator
+    imageUrl: generatePlaceholderUrl('University of Ghana'),
     isVerified: true,
     tags: ['university', 'public university', 'legon', 'higher education']
   },
@@ -160,7 +123,7 @@ export const dummyEntities: Entity[] = [
     category: 'Transport',
     subCategory: 'Bus Terminal',
     description: 'Major terminal for VIP Jeoun Transport services.',
-    contact: { 
+    contact: {
       phone: '+233 24 439 9111' // Example
     },
     location: {
@@ -172,7 +135,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5670,
       longitude: -0.2065
     },
-    isVerified: false, // Assume not verified for variety
+    isVerified: false, // Example of an unverified entity
     tags: ['bus station', 'vip bus', 'intercity bus', 'circle']
   },
   {
@@ -215,7 +178,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.6178,
       longitude: -0.1680
     },
-    imageUrl: generatePlaceholderUrl('Cinema'), 
+    imageUrl: generatePlaceholderUrl('Cinema'),
     openingHours: '10:00 AM - 10:00 PM',
     tags: ['movies', 'cinema', 'accra mall', 'films']
   },
@@ -225,7 +188,7 @@ export const dummyEntities: Entity[] = [
     category: 'Retail',
     subCategory: 'Supermarket',
     description: 'Large supermarket chain offering groceries and household items.',
-    contact: { 
+    contact: {
       phone: '+233 55 511 2233' // Placeholder phone
     },
     location: {
@@ -234,7 +197,7 @@ export const dummyEntities: Entity[] = [
       stateProvince: 'Greater Accra',
       postalCode: 'GA-550-6789',
       country: 'Ghana',
-      latitude: 5.5486, 
+      latitude: 5.5486,
       longitude: -0.3439
     },
     imageUrl: generatePlaceholderUrl('Shoprite'),
@@ -258,35 +221,12 @@ export const dummyEntities: Entity[] = [
       stateProvince: 'Greater Accra',
       postalCode: 'LA-010-1212',
       country: 'Ghana',
-      latitude: 5.5515, 
+      latitude: 5.5515,
       longitude: -0.1475
     },
-    imageUrl: generatePlaceholderUrl('Labadi Beach Hotel'), 
+    imageUrl: generatePlaceholderUrl('Labadi Beach Hotel'),
     isVerified: true,
     tags: ['hotel', 'luxury', 'beachfront', 'resort', 'pool']
-  },
-  {
-    id: 'food-002',
-    name: 'Papaye Fast Foods - Spintex Road',
-    category: 'Food',
-    subCategory: 'Restaurant',
-    description: 'Popular Ghanaian fast food chain known for grilled chicken.',
-    contact: {
-      phone: '+233 30 281 5111' // Example
-    },
-    location: {
-      addressLine1: 'Spintex Road',
-      city: 'Accra',
-      stateProvince: 'Greater Accra',
-      postalCode: 'GA-350-9988',
-      country: 'Ghana',
-      latitude: 5.6150,
-      longitude: -0.1190
-    },
-    // No imageUrl specified
-    isVerified: true,
-    openingHours: '10:00 AM - 10:00 PM',
-    tags: ['fast food', 'ghanaian food', 'chicken', 'spintex', 'takeaway']
   },
   {
     id: 'hosp-002',
@@ -343,7 +283,7 @@ export const dummyEntities: Entity[] = [
     description: 'Upscale restaurant offering West African cuisine.',
     contact: { phone: '024 484 2464', website: 'https://bukarestaurant.com/' }, // Example
     location: { addressLine1: '10th Ln', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-027-5555', country: 'Ghana', latitude: 5.5601, longitude: -0.1888 },
-    imageUrl: generatePlaceholderUrl('Buka Restaurant'), 
+    imageUrl: generatePlaceholderUrl('Buka Restaurant'),
     isVerified: true, openingHours: '12:00 PM - 11:00 PM',
     tags: ['west african food', 'nigerian food', 'ghanaian food', 'osu', 'fine dining']
   },
@@ -392,5 +332,273 @@ export const dummyEntities: Entity[] = [
     imageUrl: generatePlaceholderUrl('Accra Zoo'),
     openingHours: '9:00 AM - 5:00 PM',
     tags: ['zoo', 'animals', 'wildlife', 'achimota']
-  }
-]; 
+  },
+
+  // === PARENT ENTITY: KFC ===
+  // Represents the overall KFC brand in Ghana.
+  {
+    id: 'company-kfc',
+    name: 'KFC',
+    category: 'Food',
+    subCategory: 'Fast Food Restaurant',
+    description: 'Popular global fast-food chain specializing in fried chicken.',
+    contact: {
+      website: 'https://africa.kfc.com/ghana/',
+      phone: '+233 24 433 0000', // Main customer service number
+    },
+    // Location can represent HQ or a prominent branch
+    location: {
+      addressLine1: 'Oxford Street, Osu',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-026-5432',
+      country: 'Ghana',
+      latitude: 5.5592,
+      longitude: -0.1899
+    },
+    imageUrl: generatePlaceholderUrl('KFC Ghana'),
+    isVerified: true,
+    tags: ['fast food', 'chicken', 'takeaway', 'delivery'],
+    isParentEntity: true, // Mark as a parent entity
+    branches: ['kfc-osu', 'kfc-spintex', 'kfc-accra-mall'] // List of branch IDs
+  },
+
+  // === KFC BRANCHES ===
+  // Individual KFC locations linked to the parent entity.
+  {
+    id: 'kfc-osu',
+    parentId: 'company-kfc', // Link to the parent company
+    name: 'KFC - Osu', // Specific branch name
+    branchName: 'Osu', // Short name for display/search
+    category: 'Food',
+    subCategory: 'Fast Food Restaurant',
+    description: 'KFC branch on Oxford Street in Osu.',
+    contact: {
+      phone: '+233 24 433 0000' // Branch-specific number (can be same as parent if needed)
+    },
+    location: {
+      addressLine1: 'Oxford Street',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-026-5432',
+      country: 'Ghana',
+      latitude: 5.5592,
+      longitude: -0.1899
+    },
+    imageUrl: generatePlaceholderUrl('KFC Osu Branch'),
+    isVerified: true,
+    openingHours: '10:00 AM - 11:00 PM',
+    tags: ['fast food', 'chicken', 'osu', 'takeaway', 'delivery'] // Branch specific tags can differ
+  },
+  {
+    id: 'kfc-spintex',
+    parentId: 'company-kfc',
+    name: 'KFC - Spintex',
+    branchName: 'Spintex',
+    category: 'Food',
+    subCategory: 'Fast Food Restaurant',
+    description: 'KFC branch located on Spintex Road.',
+    contact: {
+      phone: '+233 55 830 5886' // Example branch number
+    },
+    location: {
+      addressLine1: 'Spintex Rd, Near Action Chapel',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-351-1122',
+      country: 'Ghana',
+      latitude: 5.6145,
+      longitude: -0.1185
+    },
+    imageUrl: generatePlaceholderUrl('KFC Spintex Branch'),
+    isVerified: true,
+    openingHours: '10:00 AM - 10:30 PM',
+    tags: ['fast food', 'chicken', 'spintex', 'takeaway', 'delivery', 'drive-thru'] // Added 'drive-thru' tag
+  },
+  {
+    id: 'kfc-accra-mall',
+    parentId: 'company-kfc',
+    name: 'KFC - Accra Mall',
+    branchName: 'Accra Mall',
+    category: 'Food',
+    subCategory: 'Fast Food Restaurant',
+    description: 'KFC branch inside Accra Mall food court.',
+    contact: {
+      phone: '+233 24 433 0001' // Example branch number
+    },
+    location: {
+      addressLine1: 'Accra Mall Food Court, Tetteh Quarshie Interchange',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-420-1235',
+      country: 'Ghana',
+      latitude: 5.6180,
+      longitude: -0.1682
+    },
+    imageUrl: generatePlaceholderUrl('KFC Accra Mall Branch'),
+    isVerified: true,
+    openingHours: '10:00 AM - 10:00 PM (Mall Hours)',
+    tags: ['fast food', 'chicken', 'accra mall', 'food court', 'takeaway']
+  },
+
+  // === PARENT ENTITY: GCB BANK ===
+  // Represents the GCB Bank brand.
+  {
+    id: 'company-gcb',
+    name: 'GCB Bank',
+    category: 'Financial',
+    subCategory: 'Bank',
+    description: 'One of Ghana\'s largest commercial banks with branches nationwide.',
+    contact: {
+      phone: '+233 30 225 5100', // Main customer service number
+      website: 'https://www.gcbbank.com.gh/'
+    },
+    location: { // HQ Location
+      addressLine1: 'High Street, Accra Central',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-030-1234',
+      country: 'Ghana',
+      latitude: 5.5505,
+      longitude: -0.2057
+    },
+    imageUrl: generatePlaceholderUrl('GCB Bank Ghana'),
+    isVerified: true,
+    tags: ['bank', 'financial services', 'atm'], // General tags for the brand
+    isParentEntity: true,
+    branches: ['gcb-legon', 'gcb-osu'] // IDs of associated branches
+  },
+
+  // === GCB BANK BRANCHES ===
+  {
+    id: 'gcb-legon',
+    parentId: 'company-gcb',
+    name: 'GCB Bank - Legon',
+    branchName: 'Legon',
+    category: 'Financial',
+    subCategory: 'Bank',
+    description: 'GCB Bank branch near the University of Ghana.',
+    contact: {
+      phone: '+233 30 250 0052' // Legon branch number
+    },
+    location: {
+      addressLine1: 'University of Ghana Campus',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'LG-001-9876',
+      country: 'Ghana',
+      latitude: 5.6508,
+      longitude: -0.1870
+    },
+    imageUrl: generatePlaceholderUrl('GCB Bank Legon Branch'),
+    isVerified: true,
+    openingHours: '8:30 AM - 4:00 PM (Mon-Fri)',
+    tags: ['bank', 'atm', 'gcb', 'legon', 'campus'] // Branch specific tags
+  },
+  {
+    id: 'gcb-osu',
+    parentId: 'company-gcb',
+    name: 'GCB Bank - Osu',
+    branchName: 'Osu',
+    category: 'Financial',
+    subCategory: 'Bank',
+    description: 'GCB Bank branch in Osu.',
+    contact: {
+      phone: '+233 30 277 3068' // Osu branch number
+    },
+    location: {
+      addressLine1: 'Oxford Street, Opposite Papaye',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-026-5433',
+      country: 'Ghana',
+      latitude: 5.5590,
+      longitude: -0.1895
+    },
+    imageUrl: generatePlaceholderUrl('GCB Bank Osu Branch'),
+    isVerified: true,
+    openingHours: '8:30 AM - 4:00 PM (Mon-Fri)',
+    tags: ['bank', 'atm', 'gcb', 'osu', 'oxford street']
+  },
+
+  // === PARENT ENTITY: PAPAYE FAST FOODS ===
+  // Represents the Papaye brand.
+  {
+    id: 'company-papaye',
+    name: 'Papaye Fast Foods',
+    category: 'Food',
+    subCategory: 'Restaurant',
+    description: 'Popular Ghanaian fast food chain known for grilled chicken.',
+    contact: {
+      phone: '+233 30 277 3714', // Main office number
+      website: 'https://www.papayeghana.com/' // Example website
+    },
+    location: { // HQ/Flagship branch location
+      addressLine1: 'Oxford Street, Osu',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-026-5434',
+      country: 'Ghana',
+      latitude: 5.5595,
+      longitude: -0.1900
+    },
+    imageUrl: generatePlaceholderUrl('Papaye Ghana'),
+    isVerified: true,
+    tags: ['fast food', 'ghanaian food', 'chicken', 'takeaway'], // General brand tags
+    isParentEntity: true,
+    branches: ['papaye-osu', 'papaye-spintex'] // IDs of branches
+  },
+
+  // === PAPAYE BRANCHES ===
+  {
+    id: 'papaye-spintex',
+    parentId: 'company-papaye',
+    name: 'Papaye Fast Foods - Spintex',
+    branchName: 'Spintex',
+    category: 'Food',
+    subCategory: 'Restaurant',
+    description: 'Papaye Fast Foods branch on Spintex Road.',
+    contact: {
+      phone: '+233 30 281 5111' // Spintex branch number
+    },
+    location: {
+      addressLine1: 'Spintex Road',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-350-9988',
+      country: 'Ghana',
+      latitude: 5.6150,
+      longitude: -0.1190
+    },
+    imageUrl: generatePlaceholderUrl('Papaye Spintex Branch'),
+    isVerified: true,
+    openingHours: '10:00 AM - 10:00 PM',
+    tags: ['fast food', 'ghanaian food', 'chicken', 'spintex', 'takeaway']
+  },
+  {
+    id: 'papaye-osu',
+    parentId: 'company-papaye',
+    name: 'Papaye Fast Foods - Osu',
+    branchName: 'Osu',
+    category: 'Food',
+    subCategory: 'Restaurant',
+    description: 'Papaye Fast Foods flagship branch located on Oxford Street, Osu.',
+    contact: {
+      phone: '+233 30 277 3715' // Osu branch number
+    },
+    location: {
+      addressLine1: 'Oxford Street, Osu',
+      city: 'Accra',
+      stateProvince: 'Greater Accra',
+      postalCode: 'GA-026-5434',
+      country: 'Ghana',
+      latitude: 5.5595,
+      longitude: -0.1900
+    },
+    imageUrl: generatePlaceholderUrl('Papaye Osu Branch'),
+    isVerified: true,
+    openingHours: '10:00 AM - 11:00 PM',
+    tags: ['fast food', 'ghanaian food', 'chicken', 'osu', 'oxford street', 'takeaway']
+  },
+
+]; // End of dummyEntities array

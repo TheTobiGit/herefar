@@ -2,6 +2,7 @@
   <div 
     class="p-3 rounded-lg bg-[#25262B] border border-[#313236] hover:border-[#4D4F59] transition-all duration-150 cursor-pointer"
     :class="props.size === 'small' ? 'p-2.5' : 'p-3'" 
+    @click="handleClick"
   >
     <div class="flex items-center">
       <!-- Entity Category Icon -->
@@ -52,8 +53,18 @@ const props = withDefaults(defineProps<PlaceCardProps>(), {
   size: 'normal', // Default size is normal
 });
 
+// Define emits
+const emit = defineEmits<{ 
+  (e: 'click', id: string): void; // Emit entity ID on click
+}>();
+
 // Get category styling functions
 const { getCategoryIcon, getCategoryBgColor, getCategoryTextColor } = useCategoryStyles();
+
+// Click handler
+const handleClick = () => {
+  emit('click', props.entity.id);
+};
 </script>
 
 <style scoped>

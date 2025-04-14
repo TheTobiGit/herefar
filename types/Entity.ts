@@ -150,5 +150,29 @@ export interface Entity {
    * E.g., ['fast food', 'chicken', 'drive-thru'] for KFC
    * E.g., ['private', 'specialist', 'cardiology'] for a clinic
    */
-  tags?: string[]; 
+  tags?: string[];
+  
+  /**
+   * For entities that are parent organizations (e.g., KFC as a brand).
+   * Contains branch IDs that reference child entities.
+   */
+  branches?: string[];
+  
+  /**
+   * For branch entities, references the parent entity ID.
+   * If not specified, the entity is considered a standalone or parent entity.
+   */
+  parentId?: string;
+  
+  /**
+   * For branch entities, specifies the branch location name (e.g., "Osu", "Spintex").
+   * Used for display and search purposes.
+   */
+  branchName?: string;
+  
+  /**
+   * Flag indicating if this entity is a parent/company entity rather than a specific location.
+   * Parent entities typically represent brands or organizations with multiple branches.
+   */
+  isParentEntity?: boolean;
 } 

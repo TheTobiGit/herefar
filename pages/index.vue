@@ -73,6 +73,7 @@
             v-for="(message, index) in messages" 
             :key="index" 
             :message="message" 
+            @placeClick="showExpandedPlace"
           />
         </TransitionGroup>
         
@@ -119,7 +120,7 @@ import type { EntityCategory } from '~/types/Entity';
 const { getCategoryIcon, getCategoryBgColor, getCategoryTextColor } = useCategoryStyles();
 
 // Use the chat composable
-const { messages, isTyping, messageInput, sendMessage } = useChat();
+const { messages, isTyping, messageInput, sendMessage, showExpandedPlace } = useChat();
 
 // Use Page Info composable
 const { 
