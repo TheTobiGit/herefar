@@ -1,8 +1,8 @@
 import { ref } from 'vue'; // Import ref explicitly for composables
 import type { Entity } from '~/types/Entity';
 import { dummyEntities } from '~/data/entities';
-import { useIntentRecognizer } from './useIntentRecognizer'; // Import the intent recognizer
-import type { IntentRecognitionResult } from './useIntentRecognizer'; // Import the result type
+import { useIntentRecognizerV1 } from './useIntentRecognizerV1'; // Import the V1 intent recognizer
+import type { IntentRecognitionResult } from './useIntentRecognizerV1'; // Import the result type from V1
 
 // Define message interface within the composable
 // (Could be moved to types/index.ts later if needed elsewhere)
@@ -40,16 +40,16 @@ const getCurrentTimeFormatted = (): string => {
 };
 
 /**
- * Composable for managing chat state and interactions.
+ * Composable for managing chat state and interactions (Version 1).
  */
-export const useChat = () => {
+export const useChatV1 = () => {
   // --- State --- 
   const messages = ref<Message[]>([]);
   const isTyping = ref(false);
   const messageInput = ref('');
 
   // Get the intent recognizer function
-  const { recognizeIntent } = useIntentRecognizer();
+  const { recognizeIntent } = useIntentRecognizerV1();
   
   // --- Core Logic --- 
 
@@ -120,7 +120,7 @@ export const useChat = () => {
           
           if (company && branches.length > 0) {
             // Add distance to branches for display
-            const branchesWithDistance = branches.map(branch => ({ 
+            const branchesWithDistance = branches.map((branch: Entity) => ({
               ...branch, 
               distance: getRandomDistance() 
             }));

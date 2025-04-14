@@ -14,7 +14,146 @@ export type EntityCategory =
   | 'Education'     // Schools, Universities, Libraries
   | 'Accommodation' // Hotels, Guesthouses
   | 'Retail'        // Shops, Malls
+  | 'Religious'     // Churches, Mosques, Temples
   | 'Other';        // Fallback for uncategorized entities
+
+/**
+ * Defines specific sub-categories within the 'Medical' category.
+ */
+export type MedicalSubCategory =
+  | 'Hospital'
+  | 'Clinic'
+  | 'Pharmacy'
+  | 'Laboratory'
+  | 'Dental';
+
+/**
+ * Defines specific sub-categories within the 'Security' category.
+ */
+export type SecuritySubCategory =
+  | 'Police Station'
+  | 'Fire Service'
+  | 'Private Security'
+  | 'Military Post';
+
+/**
+ * Defines specific sub-categories within the 'Utility' category.
+ */
+export type UtilitySubCategory =
+  | 'Water Provider'
+  | 'Electricity Provider'
+  | 'Telecom Provider'
+  | 'Internet Service';
+
+/**
+ * Defines specific sub-categories within the 'Transport' category.
+ */
+export type TransportSubCategory =
+  | 'Bus Station'
+  | 'Train Station'
+  | 'Airport'
+  | 'Ride-Sharing Hub'
+  | 'Port/Harbor';
+
+/**
+ * Defines specific sub-categories within the 'Food' category.
+ */
+export type FoodSubCategory =
+  | 'Restaurant'
+  | 'Cafe'
+  | 'Grocery Store'
+  | 'Food Vendor';
+
+/**
+ * Defines specific sub-categories within the 'Entertainment' category.
+ */
+export type EntertainmentSubCategory =
+  | 'Cinema'
+  | 'Park'
+  | 'Event Venue'
+  | 'Sports Facility';
+
+/**
+ * Defines specific sub-categories within the 'Financial' category.
+ */
+export type FinancialSubCategory =
+  | 'Bank'
+  | 'ATM'
+  | 'Forex Bureau'
+  | 'Mobile Money Agent';
+
+/**
+ * Defines specific sub-categories within the 'Government' category.
+ */
+export type GovernmentSubCategory =
+  | 'Ministry'
+  | 'Agency'
+  | 'Local Assembly'
+  | 'Court';
+
+/**
+ * Defines specific sub-categories within the 'Education' category.
+ */
+export type EducationSubCategory =
+  | 'School'
+  | 'University'
+  | 'Library'
+  | 'Vocational Center';
+
+/**
+ * Defines specific sub-categories within the 'Accommodation' category.
+ */
+export type AccommodationSubCategory =
+  | 'Hotel'
+  | 'Guesthouse'
+  | 'Hostel'
+  | 'Resort';
+
+/**
+ * Defines specific sub-categories within the 'Retail' category.
+ */
+export type RetailSubCategory =
+  | 'Shop'
+  | 'Mall'
+  | 'Market'
+  | 'Supermarket';
+
+/**
+ * Defines specific sub-categories within the 'Religious' category.
+ */
+export type ReligiousSubCategory =
+  | 'Church'
+  | 'Mosque'
+  | 'Shrine'
+  | 'Temple';
+
+/**
+ * Defines specific sub-categories within the 'Other' category.
+ */
+export type OtherSubCategory =
+  | 'Community Center'
+  | 'Post Office'
+  | 'Cemetery'
+  | 'Unclassified';
+
+/**
+ * Union type representing all possible sub-categories.
+ * Useful for type hinting the subCategory field in the Entity interface.
+ */
+export type AnySubCategory =
+  | MedicalSubCategory
+  | SecuritySubCategory
+  | UtilitySubCategory
+  | TransportSubCategory
+  | FoodSubCategory
+  | EntertainmentSubCategory
+  | FinancialSubCategory
+  | GovernmentSubCategory
+  | EducationSubCategory
+  | AccommodationSubCategory
+  | RetailSubCategory
+  | ReligiousSubCategory
+  | OtherSubCategory;
 
 /**
  * Represents contact information for an entity.
@@ -96,9 +235,10 @@ export interface Entity {
    */
   category: EntityCategory;
   /**
-   * Optional sub-category for more specific classification (e.g., 'Hospital' within 'Medical').
+   * Optional sub-category for more specific classification.
+   * Uses the union type `AnySubCategory` for type safety.
    */
-  subCategory?: string;
+  subCategory?: AnySubCategory;
   /**
    * A brief description of the entity.
    */

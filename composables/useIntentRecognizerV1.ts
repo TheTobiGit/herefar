@@ -70,7 +70,7 @@ parentEntities.forEach(parent => {
  * @param message - The user's input message.
  * @returns An IntentRecognitionResult object.
  */
-export const useIntentRecognizer = () => {
+export const useIntentRecognizerV1 = () => {
   const recognizeIntent = (message: string): IntentRecognitionResult => {
     const lowerCaseMessage = message.toLowerCase().trim();
     if (!lowerCaseMessage) {

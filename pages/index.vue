@@ -69,7 +69,7 @@
           name="fade-slide-list"
           class="space-y-4"
         >
-          <ChatMessageBubble 
+          <ChatMessageBubbleV1 
             v-for="(message, index) in messages" 
             :key="index" 
             :message="message" 
@@ -90,8 +90,8 @@
       </div>
     </main>
     
-    <!-- Input area - Use the component -->
-    <ChatInputFooter 
+    <!-- Input area - Use the V1 component -->
+    <ChatInputFooterV1 
       v-model:messageInput="messageInput" 
       @sendMessage="sendMessage"
     />
@@ -104,13 +104,13 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 
 // Import Composables
 import { useCategoryStyles } from '~/composables/useCategoryStyles';
-import { useChat } from '~/composables/useChat'; // Import the chat composable
+import { useChatV1 } from '~/composables/useChatV1'; // Import the V1 chat composable
 import { usePageInfo } from '~/composables/usePageInfo'; // Import usePageInfo
 
 // Import Components
 import PlaceCard from '~/components/PlaceCard.vue';
-import ChatMessageBubble from '~/components/ChatMessageBubble.vue';
-import ChatInputFooter from '~/components/ChatInputFooter.vue';
+import ChatMessageBubbleV1 from '~/components/ChatMessageBubbleV1.vue'; // Import the V1 chat bubble component
+import ChatInputFooterV1 from '~/components/ChatInputFooterV1.vue'; // Import the V1 chat input footer component
 import TopInfoBar from '~/components/TopInfoBar.vue';
 
 // Import types and data
@@ -119,8 +119,8 @@ import type { EntityCategory } from '~/types/Entity';
 // Get category styling functions from the composable
 const { getCategoryIcon, getCategoryBgColor, getCategoryTextColor } = useCategoryStyles();
 
-// Use the chat composable
-const { messages, isTyping, messageInput, sendMessage, showExpandedPlace } = useChat();
+// Use the V1 chat composable
+const { messages, isTyping, messageInput, sendMessage, showExpandedPlace } = useChatV1();
 
 // Use Page Info composable
 const { 
