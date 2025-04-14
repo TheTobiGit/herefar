@@ -1,6 +1,12 @@
 // data/entities.ts
 import type { Entity } from '~/types/Entity';
 
+// Helper function to generate placeholder URLs
+const generatePlaceholderUrl = (text: string, width = 600, height = 300, bgColor = '25262B', textColor = '9CA3AF') => {
+  const encodedText = encodeURIComponent(text);
+  return `https://placehold.co/${width}x${height}/${bgColor}/${textColor}/png?text=${encodedText}`;
+};
+
 /**
  * Dummy dataset for Entities.
  * This data is used for development and testing purposes before connecting to a real data source.
@@ -26,7 +32,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5560,
       longitude: -0.1969
     },
-    imageUrl: '/images/hospital-placeholder.jpg', // Example path, requires image file
+    imageUrl: generatePlaceholderUrl('Medical - Hospital'), // Use placeholder generator
     isVerified: true,
     openingHours: '24/7',
     tags: ['public hospital', 'general hospital', 'emergency', '24 hour']
@@ -53,6 +59,7 @@ export const dummyEntities: Entity[] = [
       serviceType: 'police',
       emergencyNumber: '191' // Ghana Police emergency short code
     },
+    // No imageUrl specified, will default to none
     isVerified: true,
     tags: ['ghana police service', 'law enforcement', 'cantonments']
   },
@@ -75,7 +82,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5592,
       longitude: -0.1899
     },
-    imageUrl: '/images/kfc-placeholder.jpg', // Example path
+    imageUrl: generatePlaceholderUrl('KFC Osu'), // Use placeholder generator
     isVerified: true,
     openingHours: '10:00 AM - 11:00 PM',
     tags: ['fast food', 'chicken', 'osu', 'takeaway', 'delivery']
@@ -99,6 +106,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5775,
       longitude: -0.1718
     },
+    // No imageUrl specified
     isVerified: true,
     tags: ['government office', 'ministry', 'digitalisation']
   },
@@ -142,7 +150,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.6508,
       longitude: -0.1870
     },
-    imageUrl: '/images/ug-placeholder.jpg', // Example path
+    imageUrl: generatePlaceholderUrl('University of Ghana'), // Use placeholder generator
     isVerified: true,
     tags: ['university', 'public university', 'legon', 'higher education']
   },
@@ -207,7 +215,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.6178,
       longitude: -0.1680
     },
-    imageUrl: '/images/cinema-placeholder.jpg', 
+    imageUrl: generatePlaceholderUrl('Cinema'), 
     openingHours: '10:00 AM - 10:00 PM',
     tags: ['movies', 'cinema', 'accra mall', 'films']
   },
@@ -229,7 +237,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5486, 
       longitude: -0.3439
     },
-    imageUrl: '/images/shoprite-placeholder.jpg',
+    imageUrl: generatePlaceholderUrl('Shoprite'),
     isVerified: true,
     openingHours: '9:00 AM - 9:00 PM',
     tags: ['supermarket', 'grocery', 'melcom', 'west hills mall', 'shopping']
@@ -253,7 +261,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.5515, 
       longitude: -0.1475
     },
-    imageUrl: '/images/hotel-placeholder.jpg', 
+    imageUrl: generatePlaceholderUrl('Labadi Beach Hotel'), 
     isVerified: true,
     tags: ['hotel', 'luxury', 'beachfront', 'resort', 'pool']
   },
@@ -275,6 +283,7 @@ export const dummyEntities: Entity[] = [
       latitude: 5.6150,
       longitude: -0.1190
     },
+    // No imageUrl specified
     isVerified: true,
     openingHours: '10:00 AM - 10:00 PM',
     tags: ['fast food', 'ghanaian food', 'chicken', 'spintex', 'takeaway']
@@ -287,6 +296,7 @@ export const dummyEntities: Entity[] = [
     description: 'Private medical facility offering specialist services.',
     contact: { phone: '030 277 5341', website: 'https://nyahomedical.com/' },
     location: { addressLine1: '35 Kofi Annan St', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-100-1111', country: 'Ghana', latitude: 5.6082, longitude: -0.1795 },
+    imageUrl: generatePlaceholderUrl('Medical Clinic'),
     isVerified: true, openingHours: '24/7',
     tags: ['private clinic', 'specialist', 'airport residential', '24 hour']
   },
@@ -306,9 +316,10 @@ export const dummyEntities: Entity[] = [
     name: 'Kotoka International Airport (ACC)',
     category: 'Transport',
     subCategory: 'Airport',
-    description: 'Ghana\'s main international airport.',
+    description: "Ghana's main international airport.",
     contact: { phone: '030 255 0612', website: 'https://www.gacl.com.gh/' },
     location: { addressLine1: 'Airport Rd', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-150-3333', country: 'Ghana', latitude: 5.6052, longitude: -0.1667 },
+    imageUrl: generatePlaceholderUrl('Airport (ACC)'),
     isVerified: true,
     tags: ['airport', 'flights', 'international travel', 'domestic travel']
   },
@@ -320,6 +331,7 @@ export const dummyEntities: Entity[] = [
     description: 'Department store selling a wide range of goods.',
     contact: { phone: '030 298 1818' }, // Example
     location: { addressLine1: 'Tema Community 25 Mall', city: 'Tema', stateProvince: 'Greater Accra', postalCode: 'GT-310-4444', country: 'Ghana', latitude: 5.7555, longitude: -0.0101 },
+    imageUrl: generatePlaceholderUrl('Melcom'),
     openingHours: '9:00 AM - 8:00 PM',
     tags: ['department store', 'shopping', 'melcom', 'tema', 'mall']
   },
@@ -331,6 +343,7 @@ export const dummyEntities: Entity[] = [
     description: 'Upscale restaurant offering West African cuisine.',
     contact: { phone: '024 484 2464', website: 'https://bukarestaurant.com/' }, // Example
     location: { addressLine1: '10th Ln', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-027-5555', country: 'Ghana', latitude: 5.5601, longitude: -0.1888 },
+    imageUrl: generatePlaceholderUrl('Buka Restaurant'), 
     isVerified: true, openingHours: '12:00 PM - 11:00 PM',
     tags: ['west african food', 'nigerian food', 'ghanaian food', 'osu', 'fine dining']
   },
@@ -342,6 +355,7 @@ export const dummyEntities: Entity[] = [
     description: 'Venue for performing arts and cultural events.',
     contact: { phone: '030 268 3197', website: 'https://nationaltheatre.gov.gh/' },
     location: { addressLine1: 'South Liberia Road', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-050-6666', country: 'Ghana', latitude: 5.5519, longitude: -0.1970 },
+    imageUrl: generatePlaceholderUrl('National Theatre'),
     isVerified: true,
     tags: ['theatre', 'performing arts', 'concerts', 'culture', 'events']
   },
@@ -364,7 +378,7 @@ export const dummyEntities: Entity[] = [
     description: 'Luxury 5-star hotel in central Accra.',
     contact: { phone: '024 243 6000', website: 'https://www.kempinski.com/en/accra/hotel-gold-coast-city/' },
     location: { addressLine1: 'PMB 66, Ministries', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'GA-050-8888', country: 'Ghana', latitude: 5.5565, longitude: -0.1995 },
-    imageUrl: '/images/kempinski-placeholder.jpg', isVerified: true,
+    imageUrl: generatePlaceholderUrl('Kempinski Hotel'), isVerified: true,
     tags: ['hotel', '5 star', 'luxury', 'spa', 'pool', 'ministries area']
   },
   {
@@ -375,6 +389,7 @@ export const dummyEntities: Entity[] = [
     description: 'Small zoo located near Achimota Forest.',
     contact: { phone: '020 811 8788' }, // Example
     location: { addressLine1: 'Achimota Forest Area', city: 'Accra', stateProvince: 'Greater Accra', postalCode: 'AC-001-9999', country: 'Ghana', latitude: 5.6394, longitude: -0.2204 },
+    imageUrl: generatePlaceholderUrl('Accra Zoo'),
     openingHours: '9:00 AM - 5:00 PM',
     tags: ['zoo', 'animals', 'wildlife', 'achimota']
   }
