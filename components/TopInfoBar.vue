@@ -1,8 +1,10 @@
 <template>
   <Transition name="fade-slide">
     <div v-if="props.isMounted" class="flex items-center justify-between text-xs text-gray-500 mb-6">
-      <!-- Left side: Time and Location -->
+      <!-- Left side: Date, Time and Location -->
       <div class="flex items-center space-x-1.5">
+        <span>{{ props.currentDate }}</span>
+        <span>•</span>
         <span>{{ props.currentTime }}</span>
         <span>•</span>
         <span class="flex items-center">
@@ -10,11 +12,7 @@
           {{ props.userLocation }}
         </span>
       </div>
-      <!-- Right side: Weather -->
-      <div class="flex items-center gap-1">
-        <Icon :name="props.weatherIcon" class="w-4 h-4" />
-        <span>{{ props.weatherTemp }}°C</span>
-      </div>
+      <!-- Right side: Weather Removed -->
     </div>
   </Transition>
 </template>
@@ -23,10 +21,9 @@
 // Define component props
 interface TopInfoBarProps {
   isMounted: boolean; // Control the transition
-  currentTime: string;
+  currentTime: string; // HH:mm format
+  currentDate: string; // Formatted date (e.g., Tuesday, May 21)
   userLocation: string;
-  weatherIcon: string;
-  weatherTemp: number;
 }
 
 // Define props using the interface
@@ -36,7 +33,7 @@ const props = defineProps<TopInfoBarProps>();
 </script>
 
 <style scoped>
-/* Fade-Slide Transition (Can be moved to global styles later if reused often) */
+/* Fade-Slide Transition */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;

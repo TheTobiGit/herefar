@@ -8,9 +8,8 @@
       <TopInfoBar 
         :isMounted="isMounted" 
         :currentTime="currentTime"
+        :currentDate="currentDate"
         :userLocation="userLocation"
-        :weatherIcon="weatherIcon"
-        :weatherTemp="weatherTemp"
       />
       
       <!-- Initial content - shown when no messages exist -->
@@ -118,7 +117,7 @@ const sendMessage = () => {
   console.log('Send message (Placeholder):', messageInput.value);
   if (!messageInput.value.trim()) return;
   // Basic simulation: Add user message and clear input
-  messages.value.push({ text: messageInput.value, isUser: true, time: new Date().toLocaleTimeString() });
+  messages.value.push({ text: messageInput.value, isUser: true, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'}) });
   messageInput.value = '';
   // TODO: Integrate with useChat logic
 };
@@ -132,8 +131,13 @@ const showExpandedPlace = (entity: Entity) => {
 
 // Use Page Info composable
 const { 
-  isMounted, currentTime, timeOfDay, weatherIcon, weatherTemp, 
-  userLocation, nearbyPlaces, recentItems 
+  isMounted, 
+  currentTime, 
+  currentDate,
+  timeOfDay, 
+  userLocation, 
+  nearbyPlaces, 
+  recentItems 
 } = usePageInfo();
 
 // Scroll to bottom of chat
